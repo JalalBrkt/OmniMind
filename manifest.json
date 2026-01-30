@@ -1,12 +1,14 @@
 {
   "name": "OmniMind Professional",
   "short_name": "OmniMind",
-  "description": "A minimalist notepad app for infinite ideas.",
+  "id": "omnimind-app-v8",
+  "description": "A sleek, minimalist notepad for capturing infinite ideas, facts, and insights with a local-first database.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#05070a",
   "theme_color": "#05070a",
   "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "icon-192.png",
@@ -24,7 +26,14 @@
     {
       "name": "Add New Fact",
       "url": "index.html#view-add",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "description": "Quickly archive a new thought or idea",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Review Insights",
+      "url": "index.html#view-review",
+      "description": "Start a randomized flashcard session",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
