@@ -1,8 +1,8 @@
 {
   "name": "OmniMind Professional",
   "short_name": "OmniMind",
-  "id": "omnimind-app-v8",
-  "description": "A sleek, minimalist notepad for capturing infinite ideas, facts, and insights with a local-first database.",
+  "id": "com.omnimind.pro.v8",
+  "description": "Your portable second brain for recording facts and infinite ideas.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#05070a",
@@ -11,12 +11,12 @@
   "categories": ["productivity", "utilities"],
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -26,14 +26,8 @@
     {
       "name": "Add New Fact",
       "url": "index.html#view-add",
-      "description": "Quickly archive a new thought or idea",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
-    },
-    {
-      "name": "Review Insights",
-      "url": "index.html#view-review",
-      "description": "Start a randomized flashcard session",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
+      "description": "Quickly archive a new thought",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }
