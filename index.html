@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="manifest" href="manifest.json">
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>OmniMind Crystal | V6</title>
+    <title>OmniMind Pro</title>
+    <meta name="theme-color" content="#05070a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -24,123 +21,65 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            height: 100vh;
-            overflow: hidden;
-            background-image: radial-gradient(circle at 50% -10%, #1e293b 0%, #05070a 100%);
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; background-image: radial-gradient(circle at 50% -10%, #1e293b 0%, #05070a 100%); }
 
-        /* --- Global Layout --- */
+        header { position: fixed; top: 0; width: 100%; height: 70px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: linear-gradient(to bottom, var(--bg) 60%, transparent); }
         .app-view { height: 100vh; padding: 90px 20px 110px 20px; overflow-y: auto; display: none; scrollbar-width: none; }
         .app-view.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        header {
-            position: fixed; top: 0; width: 100%; height: 70px;
-            padding: 0 20px; display: flex; justify-content: space-between; align-items: center;
-            z-index: 2000; background: linear-gradient(to bottom, var(--bg) 60%, transparent);
-        }
-
-        /* --- Components --- */
-        textarea, input[type="text"] {
-            width: 100%; background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 18px; border-radius: 18px; color: white; font-family: inherit; font-size: 1rem;
-            margin-bottom: 15px; transition: 0.3s; outline: none;
-        }
-        textarea:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); }
-
+        textarea, input[type="text"] { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); padding: 18px; border-radius: 18px; color: white; font-family: inherit; font-size: 1rem; margin-bottom: 15px; outline: none; }
         .cat-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 10px; scrollbar-width: none; }
-        .cat-row::-webkit-scrollbar { display: none; }
-
-        .cat-pill {
-            flex: 0 0 auto; padding: 8px 18px; border-radius: 50px;
-            font-size: 0.75rem; font-weight: 600; background: var(--glass);
-            border: 1px solid var(--glass-border); color: var(--text-dim); cursor: pointer;
-        }
+        .cat-pill { flex: 0 0 auto; padding: 8px 18px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); cursor: pointer; }
         .cat-pill.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-        /* --- Vault Card System --- */
-        .note-card {
-            background: var(--panel); border: 1px solid var(--glass-border);
-            padding: 22px; border-radius: 24px; margin-bottom: 15px; position: relative;
-            transition: all 0.3s ease;
-        }
-        .note-card.expanded { border-color: var(--accent); }
-        
+        .note-card { background: var(--panel); border: 1px solid var(--glass-border); padding: 22px; border-radius: 24px; margin-bottom: 15px; position: relative; }
         .dots-btn { position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 1.2rem; width: 30px; text-align: center; }
-        
-        .dropdown {
-            position: absolute; top: 45px; right: 15px; background: #1a2236; 
-            border: 1px solid var(--glass-border); border-radius: 14px; z-index: 500; display: none;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5); overflow: hidden;
-        }
+        .dropdown { position: absolute; top: 45px; right: 15px; background: #1a2236; border: 1px solid var(--glass-border); border-radius: 14px; z-index: 500; display: none; box-shadow: 0 15px 30px rgba(0,0,0,0.5); overflow: hidden; }
         .dropdown div { padding: 12px 25px; font-size: 0.85rem; cursor: pointer; color: var(--text); }
         .dropdown div:hover { background: var(--accent); color: var(--bg); }
-
         .read-more { color: var(--accent); font-size: 0.75rem; font-weight: 800; cursor: pointer; margin-top: 10px; display: block; }
 
-        /* --- Modals --- */
-        .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(12px); z-index: 5000;
-            display: none; align-items: center; justify-content: center; padding: 25px;
-        }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(12px); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 25px; }
         .modal-content { background: var(--panel); width: 100%; max-width: 420px; border-radius: 30px; padding: 30px; border: 1px solid var(--glass-border); }
-
         .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
         .btn-primary { background: var(--accent); color: var(--bg); }
         .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--glass-border); margin-top: 10px; }
 
-        /* --- Flashcards --- */
         #flash-stage { position: relative; height: 55vh; }
-        .tinder-card {
-            position: absolute; inset: 0; background: var(--panel); border-radius: 35px;
-            padding: 40px; display: flex; flex-direction: column; justify-content: center;
-            text-align: center; border: 1px solid var(--glass-border);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5); touch-action: none;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-        }
+        .tinder-card { position: absolute; inset: 0; background: var(--panel); border-radius: 35px; padding: 40px; display: flex; flex-direction: column; justify-content: center; text-align: center; border: 1px solid var(--glass-border); box-shadow: 0 30px 60px rgba(0,0,0,0.5); touch-action: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; }
 
-        nav {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 280px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px);
-            border-radius: 100px; display: flex; padding: 6px; border: 1px solid var(--glass-border); z-index: 1000;
-        }
+        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 280px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-radius: 100px; display: flex; padding: 6px; border: 1px solid var(--glass-border); z-index: 1000; }
         .nav-item { flex: 1; text-align: center; padding: 12px; cursor: pointer; border-radius: 100px; transition: 0.3s; color: var(--text-dim); font-size: 0.8rem; }
         .nav-item.active { background: var(--accent); color: var(--bg); font-weight: 800; }
     </style>
 </head>
 <body>
-
     <div id="edit-fact-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-bottom: 20px;">Edit Fact</h3>
+            <h3>Edit Memory</h3>
             <textarea id="edit-fact-input" rows="8"></textarea>
-            <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px;">CHANGE CATEGORY</div>
             <select id="edit-fact-cat" style="width:100%; padding:12px; background:var(--glass); border:1px solid var(--glass-border); color:white; border-radius:12px; margin-bottom:20px;"></select>
-            <button class="btn btn-primary" onclick="app.commitEdit()">Update Memory</button>
+            <button class="btn btn-primary" onclick="app.commitEdit()">Save Changes</button>
             <button class="btn btn-ghost" onclick="app.closeModal('edit-fact-modal')">Cancel</button>
         </div>
     </div>
 
     <div id="cat-modal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-bottom: 20px;">Clusters</h3>
-            <div id="cat-mgr-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 20px;"></div>
+            <h3>Manage Clusters</h3>
+            <div id="cat-mgr-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 20px;"></div>
             <div style="display: flex; gap: 8px;">
                 <input type="text" id="new-cat-n" placeholder="New Cluster..." style="margin:0;">
                 <input type="color" id="new-cat-c" value="#38bdf8" style="width:50px; height:50px; padding:0; border:none; background:none;">
             </div>
-            <button class="btn btn-primary" style="margin-top:15px;" onclick="app.addCat()">Create Cluster</button>
+            <button class="btn btn-primary" style="margin-top:15px;" onclick="app.addCat()">Create New</button>
             <button class="btn btn-ghost" onclick="app.closeModal('cat-modal')">Close</button>
         </div>
     </div>
 
     <header>
-        <h2 style="font-weight: 800; font-size: 1rem; letter-spacing: -0.5px;">OMNIMIND</h2>
+        <h2 style="font-weight: 800; font-size: 1rem;">OMNIMIND</h2>
         <div style="font-size: 1.2rem; cursor: pointer;" onclick="app.openSync()">⚙️</div>
     </header>
 
@@ -150,9 +89,9 @@
     </section>
 
     <section id="view-add" class="app-view">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1px; font-weight: 800;">CATEGORY CLUSTER</span>
-            <span onclick="app.openCatModal()" style="font-size: 0.65rem; color: var(--accent); cursor: pointer; font-weight: 800;">MANAGE</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.65rem; font-weight:800;">
+            <span style="color:var(--text-dim)">CATEGORY</span>
+            <span onclick="app.openCatModal()" style="color:var(--accent); cursor:pointer;">MANAGE CLUSTERS</span>
         </div>
         <div class="cat-row" id="a-cats"></div>
         <textarea id="a-input" rows="12" placeholder="Record a thought..."></textarea>
@@ -172,207 +111,179 @@
     </nav>
 
     <div id="sync-modal" class="modal"><div class="modal-content">
-        <h3>Sync Brain</h3>
+        <h3>Sync & Reset</h3>
         <button class="btn btn-primary" onclick="app.export()">Export JSON</button>
         <button class="btn btn-ghost" onclick="document.getElementById('imp').click()">Import JSON</button>
         <input type="file" id="imp" hidden onchange="app.import(event)">
+        <button class="btn btn-ghost" onclick="app.wipe()" style="color:var(--danger)">Wipe Everything</button>
         <button class="btn btn-ghost" onclick="app.closeModal('sync-modal')">Back</button>
     </div></div>
 
     <script>
         const app = {
-            notes: JSON.parse(localStorage.getItem('omni_v6_notes')) || [],
-            cats: JSON.parse(localStorage.getItem('omni_v6_cats')) || [
+            notes: JSON.parse(localStorage.getItem('omni_v7_notes')) || [],
+            cats: JSON.parse(localStorage.getItem('omni_v7_cats')) || [
                 {n: 'General', c: '#64748b'}, {n: 'Wisdom', c: '#fbbf24'}, {n: 'Code', c: '#10b981'}
             ],
             vFilter: 'All', rFilter: 'All', aSel: 'General',
-            fStack: [], fIdx: 0, touchX: 0,
-            editId: null,
-            expandedIds: new Set(),
+            fStack: [], fIdx: 0, touchX: 0, editId: null, expandedIds: new Set(),
 
-            init() {
-                this.renderAll();
-                this.setupSwipe();
-                window.onclick = (e) => { if(!e.target.matches('.dots-btn')) this.closeDrops(); };
+            init() { 
+                this.renderAll(); 
+                this.setupSwipe(); 
+                window.onclick = (e) => { if(!e.target.matches('.dots-btn')) this.closeDrops(); }; 
+                if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); } 
+            },
+            nav(id, el) { 
+                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active')); 
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
+                document.getElementById(id).classList.add('active'); 
+                el.classList.add('active'); 
+                if(id === 'view-review') this.initFlash(); 
+            },
+            renderAll() { 
+                localStorage.setItem('omni_v7_notes', JSON.stringify(this.notes)); 
+                localStorage.setItem('omni_v7_cats', JSON.stringify(this.cats)); 
+                this.renderVault(); 
+                this.renderAdd(); 
+                this.renderReviewCats(); 
             },
 
-            nav(id, el) {
-                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
-                el.classList.add('active');
-                if(id === 'view-review') this.initFlash();
-            },
-
-            renderAll() {
-                localStorage.setItem('omni_v6_notes', JSON.stringify(this.notes));
-                localStorage.setItem('omni_v6_cats', JSON.stringify(this.cats));
-                this.renderVault();
-                this.renderAdd();
-                this.renderReviewCats();
-            },
-
-            // --- VAULT ENGINE ---
             renderVault() {
-                const row = document.getElementById('v-filters');
-                row.innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.vFilter === f ? 'active' : ''}" onclick="app.vFilter='${f}';app.renderVault()">${f}</div>`).join('');
-
+                document.getElementById('v-filters').innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.vFilter === f ? 'active' : ''}" onclick="app.vFilter='${f}';app.renderVault()">${f}</div>`).join('');
                 const list = document.getElementById('v-list');
                 const filtered = this.vFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.vFilter);
-                
                 list.innerHTML = filtered.map(n => {
                     const isExpanded = this.expandedIds.has(n.id);
-                    const needsTruncation = n.txt.length > 60;
-                    const displayTxt = (needsTruncation && !isExpanded) ? n.txt.substring(0, 60) + '...' : n.txt;
-                    
-                    return `
-                    <div class="note-card ${isExpanded ? 'expanded' : ''}">
+                    const needsTrunc = n.txt.length > 60;
+                    const displayTxt = (needsTrunc && !isExpanded) ? n.txt.substring(0, 60) + '...' : n.txt;
+                    return `<div class="note-card ${isExpanded ? 'expanded' : ''}">
                         <div style="font-size:0.6rem; font-weight:800; color:${this.getCol(n.cat)}; margin-bottom:8px;">${n.cat.toUpperCase()}</div>
                         <div style="line-height:1.6; white-space:pre-wrap;">${this.esc(displayTxt)}</div>
-                        ${needsTruncation ? `<span class="read-more" onclick="app.toggleExpand(${n.id})">${isExpanded ? 'SHOW LESS' : 'READ MORE'}</span>` : ''}
+                        ${needsTrunc ? `<span class="read-more" onclick="app.toggleExpand(${n.id})">${isExpanded?'LESS':'READ MORE'}</span>`:''}
                         <div class="dots-btn" onclick="app.openDrop(event, ${n.id})">⋮</div>
-                        <div class="dropdown" id="dr-${n.id}">
-                            <div onclick="app.openEdit(${n.id})">✏️ Edit</div>
-                            <div onclick="app.del(${n.id})" style="color:var(--danger)">🗑️ Delete</div>
-                        </div>
+                        <div class="dropdown" id="dr-${n.id}"><div onclick="app.openEdit(${n.id})">✏️ Edit</div><div onclick="app.del(${n.id})" style="color:var(--danger)">🗑️ Delete</div></div>
                     </div>`;
                 }).join('');
             },
-
-            toggleExpand(id) {
-                if(this.expandedIds.has(id)) this.expandedIds.delete(id);
-                else this.expandedIds.add(id);
-                this.renderVault();
-            },
-
-            openDrop(e, id) {
-                e.stopPropagation(); this.closeDrops();
-                document.getElementById(`dr-${id}`).style.display = 'block';
-            },
+            toggleExpand(id) { if(this.expandedIds.has(id)) this.expandedIds.delete(id); else this.expandedIds.add(id); this.renderVault(); },
+            openDrop(e, id) { e.stopPropagation(); this.closeDrops(); document.getElementById(`dr-${id}`).style.display = 'block'; },
             closeDrops() { document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none'); },
-
-            // --- EDIT ENGINE ---
             openEdit(id) {
-                const n = this.notes.find(x => x.id === id);
-                this.editId = id;
+                const n = this.notes.find(x => x.id === id); this.editId = id;
                 document.getElementById('edit-fact-input').value = n.txt;
                 const sel = document.getElementById('edit-fact-cat');
                 sel.innerHTML = this.cats.map(c => `<option value="${c.n}" ${c.n===n.cat?'selected':''}>${c.n}</option>`).join('');
                 document.getElementById('edit-fact-modal').style.display = 'flex';
             },
-
-            commitEdit() {
-                const n = this.notes.find(x => x.id === this.editId);
-                n.txt = document.getElementById('edit-fact-input').value;
-                n.cat = document.getElementById('edit-fact-cat').value;
-                this.closeModal('edit-fact-modal');
-                this.renderAll();
+            commitEdit() { 
+                const n = this.notes.find(x => x.id === this.editId); 
+                n.txt = document.getElementById('edit-fact-input').value; 
+                n.cat = document.getElementById('edit-fact-cat').value; 
+                this.closeModal('edit-fact-modal'); 
+                this.renderAll(); 
             },
-
             del(id) { if(confirm("Discard fact?")) { this.notes = this.notes.filter(n => n.id !== id); this.renderAll(); } },
 
-            // --- ADD ENGINE ---
-            renderAdd() {
-                document.getElementById('a-cats').innerHTML = this.cats.map(c => `
-                    <div class="cat-pill ${this.aSel === c.n ? 'active' : ''}" onclick="app.aSel='${c.n}';app.renderAdd()">${c.n}</div>`).join('');
+            renderAdd() { document.getElementById('a-cats').innerHTML = this.cats.map(c => `<div class="cat-pill ${this.aSel === c.n ? 'active' : ''}" onclick="app.aSel='${c.n}';app.renderAdd()">${c.n}</div>`).join(''); },
+            save() { 
+                const val = document.getElementById('a-input').value; 
+                if(!val) return; 
+                this.notes.unshift({id: Date.now(), txt: val, cat: this.aSel}); 
+                document.getElementById('a-input').value = ''; 
+                this.renderAll(); 
+                const t = document.getElementById('toast'); t.style.display = 'block'; 
+                setTimeout(() => t.style.display = 'none', 1500); 
             },
 
-            save() {
-                const val = document.getElementById('a-input').value;
-                if(!val) return;
-                this.notes.unshift({ id: Date.now(), txt: val, cat: this.aSel });
-                document.getElementById('a-input').value = '';
-                this.renderAll();
-                const t = document.getElementById('toast'); t.style.display = 'block';
-                setTimeout(() => t.style.display = 'none', 1500);
+            initFlash() { 
+                const pool = this.rFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.rFilter); 
+                this.fStack = [...pool].sort(() => Math.random() - 0.5); 
+                this.fIdx = 0; 
+                this.renderReviewCats(); 
+                this.renderCard(); 
             },
-
-            // --- FLASHCARD ENGINE (With Loop) ---
-            renderReviewCats() {
-                document.getElementById('r-filters').innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.rFilter === f ? 'active' : ''}" onclick="app.rFilter='${f}';app.initFlash()">${f}</div>`).join('');
-            },
-
-            initFlash() {
-                const pool = this.rFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.rFilter);
-                this.fStack = [...pool].sort(() => Math.random() - 0.5);
-                this.fIdx = 0;
-                this.renderReviewCats();
-                this.renderCard();
-            },
-
+            renderReviewCats() { document.getElementById('r-filters').innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.rFilter === f ? 'active' : ''}" onclick="app.rFilter='${f}';app.initFlash()">${f}</div>`).join(''); },
             renderCard() {
-                const s = document.getElementById('flash-stage');
-                if(!this.fStack.length) { s.innerHTML = `<div class="tinder-card">No Cluster Data</div>`; return; }
+                const s = document.getElementById('flash-stage'); 
+                if(!this.fStack.length) { s.innerHTML = `<div class="tinder-card">Empty</div>`; return; }
                 const n = this.fStack[this.fIdx];
-                s.innerHTML = `<div class="tinder-card" id="cur-c" style="border-top: 6px solid ${this.getCol(n.cat)}">
-                    <small style="color:var(--text-dim); margin-bottom:20px; font-weight:800; letter-spacing:1px;">${n.cat}</small>
-                    <div style="font-size:1.2rem; line-height:1.6; overflow-y:auto;">${this.esc(n.txt)}</div>
-                    <small style="margin-top:20px; opacity:0.3;">${this.fIdx + 1} / ${this.fStack.length}</small>
-                </div>`;
+                s.innerHTML = `<div class="tinder-card" id="cur-c" style="border-top: 6px solid ${this.getCol(n.cat)}"><small style="color:var(--text-dim); margin-bottom:20px; font-weight:800;">${n.cat}</small><div style="font-size:1.2rem; line-height:1.6; overflow-y:auto;">${this.esc(n.txt)}</div><small style="margin-top:20px; opacity:0.3;">${this.fIdx+1}/${this.fStack.length}</small></div>`;
+            },
+            setupSwipe() { 
+                const s = document.getElementById('flash-stage'); 
+                s.addEventListener('touchstart', e => this.touchX = e.touches[0].clientX); 
+                s.addEventListener('touchend', e => { 
+                    const diff = e.changedTouches[0].clientX - this.touchX; 
+                    if(Math.abs(diff) > 50) this.swipe(diff > 0 ? -1 : 1); 
+                }); 
+            },
+            swipe(dir) { 
+                const next = this.fIdx + dir; 
+                if(next < 0) return; 
+                if(next >= this.fStack.length) { this.initFlash(); return; } 
+                const c = document.getElementById('cur-c'); 
+                c.style.transform = `translateX(${dir * -120}px) rotate(${dir * -8}deg)`; 
+                c.style.opacity = '0'; 
+                setTimeout(() => { this.fIdx = next; this.renderCard(); }, 250); 
             },
 
-            setupSwipe() {
-                const s = document.getElementById('flash-stage');
-                s.addEventListener('touchstart', e => this.touchX = e.touches[0].clientX);
-                s.addEventListener('touchend', e => {
-                    const diff = e.changedTouches[0].clientX - this.touchX;
-                    if(Math.abs(diff) > 50) this.swipe(diff > 0 ? -1 : 1);
-                });
-            },
-
-            swipe(dir) {
-                const next = this.fIdx + dir;
-                if(next < 0) return;
-                if(next >= this.fStack.length) { this.initFlash(); return; } // LOOP
-                const c = document.getElementById('cur-c');
-                c.style.transform = `translateX(${dir * -120}px) rotate(${dir * -8}deg)`;
-                c.style.opacity = '0';
-                setTimeout(() => { this.fIdx = next; this.renderCard(); }, 250);
-            },
-
-            // --- CATEGORY MGR ---
             openCatModal() {
                 document.getElementById('cat-mgr-list').innerHTML = this.cats.map(c => `
-                    <div style="display:flex; justify-content:space-between; padding:12px; background:var(--glass); border-radius:12px; margin-bottom:8px;">
-                        <span style="color:${c.c}; font-weight:600;">${c.n}</span>
+                    <div style="display:flex; align-items:center; gap:10px; padding:12px; background:var(--glass); border-radius:12px; margin-bottom:8px;">
+                        <input type="color" value="${c.c}" onchange="app.updateCatColor('${c.n}', this.value)" style="width:30px; height:30px; border:none; background:none;">
+                        <input type="text" value="${c.n}" onchange="app.renameCat('${c.n}', this.value)" style="margin:0; padding:5px; font-size:0.8rem; height:auto;">
                         ${c.n !== 'General' ? `<span onclick="app.delCat('${c.n}')" style="cursor:pointer">✕</span>` : ''}
                     </div>`).join('');
                 document.getElementById('cat-modal').style.display = 'flex';
             },
-            addCat() {
-                const n = document.getElementById('new-cat-n').value;
-                const c = document.getElementById('new-cat-c').value;
-                if(!n || this.cats.find(x => x.n === n)) return;
-                this.cats.push({n, c});
-                document.getElementById('new-cat-n').value = '';
-                this.renderAll(); this.openCatModal();
+            updateCatColor(oldName, newCol) { 
+                const cat = this.cats.find(c => c.n === oldName); 
+                if(cat) cat.c = newCol; 
+                this.renderAll(); 
+            },
+            renameCat(oldName, newName) { 
+                if(!newName || this.cats.find(x => x.n === newName)) return;
+                const cat = this.cats.find(c => c.n === oldName);
+                if(cat) { 
+                    cat.n = newName; 
+                    this.notes.forEach(n => { if(n.cat === oldName) n.cat = newName; }); 
+                    if(this.aSel === oldName) this.aSel = newName;
+                    this.renderAll(); this.openCatModal();
+                }
+            },
+            addCat() { 
+                const n = document.getElementById('new-cat-n').value; 
+                const c = document.getElementById('new-cat-c').value; 
+                if(!n || this.cats.find(x => x.n === n)) return; 
+                this.cats.push({n, c}); 
+                document.getElementById('new-cat-n').value = ''; 
+                this.renderAll(); this.openCatModal(); 
             },
             delCat(n) { 
                 this.cats = this.cats.filter(c => c.n !== n); 
                 this.notes.forEach(x => { if(x.cat === n) x.cat = 'General'; }); 
                 this.renderAll(); this.openCatModal(); 
             },
-
-            // --- SYNC & UTILS ---
             openSync() { document.getElementById('sync-modal').style.display = 'flex'; },
             closeModal(id) { document.getElementById(id).style.display = 'none'; },
-            export() {
-                const b = new Blob([JSON.stringify({notes:this.notes, cats:this.cats})], {type:'application/json'});
-                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'omnimind.json'; a.click();
+            export() { 
+                const b = new Blob([JSON.stringify({notes:this.notes, cats:this.cats})], {type:'application/json'}); 
+                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'omnimind.json'; a.click(); 
             },
-            import(e) {
-                const r = new FileReader();
-                r.onload = (ev) => {
-                    const d = JSON.parse(ev.target.result);
-                    this.notes = d.notes; this.cats = d.cats;
-                    this.renderAll(); this.closeModal('sync-modal');
-                };
-                r.readAsText(e.target.files[0]);
+            import(e) { 
+                const r = new FileReader(); 
+                r.onload = (ev) => { 
+                    const d = JSON.parse(ev.target.result); 
+                    this.notes = d.notes; this.cats = d.cats; 
+                    this.renderAll(); this.closeModal('sync-modal'); 
+                }; 
+                r.readAsText(e.target.files[0]); 
             },
+            wipe() { if(confirm("Wipe all?")) { localStorage.clear(); location.reload(); } },
             getCol(n) { return (this.cats.find(c => c.n === n) || {c: '#fff'}).c; },
             esc(s) { const p = document.createElement('p'); p.textContent = s; return p.innerHTML; }
         };
-
         app.init();
     </script>
 </body>
