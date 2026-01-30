@@ -1,23 +1,30 @@
 {
   "name": "OmniMind Professional",
   "short_name": "OmniMind",
+  "description": "A minimalist notepad app for infinite ideas.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#05070a",
   "theme_color": "#05070a",
-  "description": "A minimalist notepad app.",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    },
+    }
+  ],
+  "shortcuts": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/192/3665/3665923.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "name": "Add New Fact",
+      "url": "index.html#view-add",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
