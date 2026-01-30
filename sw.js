@@ -1,39 +1,26 @@
-const CACHE_NAME = 'omnimind-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+const CACHE_NAME = 'omnimind-cache-v1';
+const urlsToCache = [
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
-// Precache essential files on install
-self.addEventListener('install', (event) => {
+// Install and Cache Assets
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('Caching app shell assets');
-      return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// Clean up old caches on activation
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) {
-          console.log('Clearing old cache');
-          return caches.delete(key);
-        }
-      }));
-    }).then(() => self.clients.claim())
-  );
-});
-
-// Network-first, fallback to cache for offline support
-self.addEventListener('fetch', (event) => {
+// Intercept requests for offline use
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
+    caches.match(event.request)
+      .then(response => {
+        // Return cached version or fetch from network
+        return response || fetch(event.request);
+      })
   );
 });
