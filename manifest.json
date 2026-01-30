@@ -1,14 +1,14 @@
 {
   "name": "OmniMind Professional",
   "short_name": "OmniMind",
-  "id": "com.omnimind.pro.v8",
-  "description": "Your portable second brain for recording facts and infinite ideas.",
+  "id": "com.omnimind.pro.final",
   "start_url": "index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#05070a",
   "theme_color": "#05070a",
+  "description": "A minimalist notepad app for infinite ideas.",
   "orientation": "portrait-primary",
-  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
@@ -24,9 +24,8 @@
   ],
   "shortcuts": [
     {
-      "name": "Add New Fact",
+      "name": "Add New",
       "url": "index.html#view-add",
-      "description": "Quickly archive a new thought",
       "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
