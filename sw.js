@@ -1,46 +1,73 @@
-// This is the "Offline page" service worker
+/*
+* OmniMind Professional Service Worker (sw.js)
+* Strategy: Network-First with Offline Fallback to index.html
+*/
+
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-const CACHE = "pwabuilder-page";
+const CACHE = "omnimind-vault-v8";
 
-// Integrated: Pointing to your single file as the offline fallback
+// Since it's a single-file app, index.html is our only required asset and fallback
 const offlineFallbackPage = "index.html";
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-});
-
-self.addEventListener('install', async (event) => {
+// 1. Install Event: Precache the essential assets
+self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.add(offlineFallbackPage))
+      .then((cache) => {
+        return cache.addAll([
+          offlineFallbackPage,
+          'manifest.json',
+          'icon-192.png',
+          'icon-512.png'
+        ]);
+      })
+      .then(() => self.skipWaiting()) // Activate new service worker immediately
   );
 });
 
-if (workbox.navigationPreload.isSupported()) {
-  workbox.navigationPreload.enable();
-}
+// 2. Activate Event: Clean up old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      // Enable navigation preload if supported
+      if (self.registration.navigationPreload) {
+        await self.registration.navigationPreload.enable();
+      }
+      
+      // Delete old versions of the cache
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.filter(name => name !== CACHE)
+                  .map(name => caches.delete(name))
+      );
+    })()
+  );
+});
 
+// 3. Fetch Event: Intercept network requests
 self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
+        // Try using the navigation preload response first
         const preloadResp = await event.preloadResponse;
+        if (preloadResp) return preloadResp;
 
-        if (preloadResp) {
-          return preloadResp;
-        }
-
-        const networkResp = await fetch(event.request);
-        return networkResp;
+        // Try to fetch from the network
+        return await fetch(event.request);
       } catch (error) {
-        // When the network fails, serve the cached index.html
+        // If network fails, return the cached index.html
         const cache = await caches.open(CACHE);
-        const cachedResp = await cache.match(offlineFallbackPage);
-        return cachedResp;
+        return await cache.match(offlineFallbackPage);
       }
     })());
+  }
+});
+
+// Handle messages (e.g., from the main page to skip waiting)
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
   }
 });
