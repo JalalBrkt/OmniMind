@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.omnimind.pro" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>OmniMind Pro</name>
+    <description>
+        A minimalist notepad app for infinite ideas.
+    </description>
+    <author email="support@omnimind.app" href="http://omnimind.app">
+        OmniMind Team
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="AndroidXEnabled" value="true" />
+        <preference name="GradlePluginKotlinEnabled" value="true" />
+        <preference name="Theme" value="@android:style/Theme.DeviceDefault.NoActionBar" />
+        <preference name="StatusBarBackgroundColor" value="#05070a" />
+        <preference name="NavigationBarBackgroundColor" value="#05070a" />
+    </platform>
+    <preference name="Orientation" value="portrait" />
+    <preference name="Fullscreen" value="false" />
+    <preference name="BackgroundColor" value="0xff05070a" />
+</widget>
