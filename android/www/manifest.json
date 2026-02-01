@@ -1,5 +1,5 @@
 {
-  "name": "OmniMind Professional",
+  "name": "OmniMind Pro",
   "short_name": "OmniMind",
   "id": "com.omnimind.pro.final",
   "start_url": "index.html",
@@ -7,13 +7,15 @@
   "display": "standalone",
   "background_color": "#05070a",
   "theme_color": "#05070a",
-  "description": "A minimalist notepad app for infinite ideas.",
+  "description": "A minimalist notepad app for infinite ideas, tasks, and mind mapping.",
   "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities", "education"],
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
@@ -22,10 +24,31 @@
       "purpose": "any maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "OmniMind Vault View"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "OmniMind Mobile View"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Add New",
+      "name": "Add Note",
       "url": "index.html#view-add",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Mind Map",
+      "url": "index.html#view-mind",
       "icons": [{ "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
