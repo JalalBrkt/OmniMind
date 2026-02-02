@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.screens
+package com.omnimind.pro.ultimate.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,8 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.omnimind.pro.final.DataRepository
-import com.omnimind.pro.final.ui.theme.*
+import com.omnimind.pro.ultimate.DataRepository
+import com.omnimind.pro.ultimate.ui.theme.*
 import kotlin.math.cos
 import kotlin.math.sin
 

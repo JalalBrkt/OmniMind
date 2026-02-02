@@ -1,4 +1,4 @@
-package com.omnimind.pro.final
+package com.omnimind.pro.ultimate
 
 data class Category(
     var n: String,

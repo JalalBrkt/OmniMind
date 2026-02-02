@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui
+package com.omnimind.pro.ultimate.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -9,10 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.omnimind.pro.final.DataRepository
-import com.omnimind.pro.final.ui.screens.*
-import com.omnimind.pro.final.ui.components.Header
-import com.omnimind.pro.final.ui.components.SettingsDialog
+import com.omnimind.pro.ultimate.DataRepository
+import com.omnimind.pro.ultimate.ui.screens.*
+import com.omnimind.pro.ultimate.ui.components.Header
+import com.omnimind.pro.ultimate.ui.components.SettingsDialog
 
 @Composable
 fun MainApp(repo: DataRepository) {

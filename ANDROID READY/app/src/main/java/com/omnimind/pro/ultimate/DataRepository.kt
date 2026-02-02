@@ -1,4 +1,4 @@
-package com.omnimind.pro.final
+package com.omnimind.pro.ultimate
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf

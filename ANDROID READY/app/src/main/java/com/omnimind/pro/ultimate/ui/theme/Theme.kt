@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.theme
+package com.omnimind.pro.ultimate.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
