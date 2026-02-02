@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.screens
+package com.omnimind.pro.ultimate.ui.screens
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -21,11 +21,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.omnimind.pro.final.DataRepository
-import com.omnimind.pro.final.Note
-import com.omnimind.pro.final.ui.components.FilterPill
-import com.omnimind.pro.final.ui.components.MarkdownText
-import com.omnimind.pro.final.ui.theme.*
+import com.omnimind.pro.ultimate.DataRepository
+import com.omnimind.pro.ultimate.Note
+import com.omnimind.pro.ultimate.ui.components.FilterPill
+import com.omnimind.pro.ultimate.ui.components.MarkdownText
+import com.omnimind.pro.ultimate.ui.theme.*
 import kotlin.math.abs
 
 @Composable
@@ -71,8 +71,8 @@ fun ReviewScreen(repo: DataRepository) {
 
 @Composable
 fun SwipeCard(note: Note, repo: DataRepository, onSwipe: () -> Unit) {
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var rotation by remember { mutableFloatStateOf(0f) }
+    var offsetX by remember(note.id) { mutableFloatStateOf(0f) }
+    var rotation by remember(note.id) { mutableFloatStateOf(0f) }
 
     val animatedOffsetX by animateFloatAsState(targetValue = offsetX, label = "offset")
     val animatedRotation by animateFloatAsState(targetValue = rotation, label = "rotation")

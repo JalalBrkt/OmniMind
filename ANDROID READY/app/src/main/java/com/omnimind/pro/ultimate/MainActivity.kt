@@ -1,10 +1,10 @@
-package com.omnimind.pro.final
+package com.omnimind.pro.ultimate
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.omnimind.pro.final.ui.MainApp
-import com.omnimind.pro.final.ui.theme.OmniMindTheme
+import com.omnimind.pro.ultimate.ui.MainApp
+import com.omnimind.pro.ultimate.ui.theme.OmniMindTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

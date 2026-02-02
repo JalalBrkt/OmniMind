@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.components
+package com.omnimind.pro.ultimate.ui.components
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
-import com.omnimind.pro.final.DataRepository
-import com.omnimind.pro.final.ui.theme.*
+import com.omnimind.pro.ultimate.DataRepository
+import com.omnimind.pro.ultimate.ui.theme.*
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader

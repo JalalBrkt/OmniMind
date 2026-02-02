@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.components
+package com.omnimind.pro.ultimate.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.omnimind.pro.final.ui.theme.*
+import com.omnimind.pro.ultimate.ui.theme.*
 
 @Composable
 fun FilterPill(text: String, active: Boolean, onClick: () -> Unit) {

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.omnimind.pro.final"
+    namespace = "com.omnimind.pro.ultimate"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.omnimind.pro.final"
+        applicationId = "com.omnimind.pro.ultimate"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

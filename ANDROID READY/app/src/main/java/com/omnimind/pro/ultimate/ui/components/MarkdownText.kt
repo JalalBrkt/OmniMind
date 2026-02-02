@@ -1,4 +1,4 @@
-package com.omnimind.pro.final.ui.components
+package com.omnimind.pro.ultimate.ui.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
