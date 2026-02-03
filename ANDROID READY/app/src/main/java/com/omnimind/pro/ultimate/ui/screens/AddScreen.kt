@@ -1,6 +1,9 @@
 package com.omnimind.pro.ultimate.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -21,18 +24,18 @@ fun AddScreen(
 ) {
     var txt by remember { mutableStateOf("") }
     var selCat by remember { mutableStateOf("General") }
-    var due by remember { mutableStateOf("") } // Simplified text input for date for now
+    var due by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.padding(20.dp)) {
         // Categories
-        Row(modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState())) {
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             cats.forEach { c ->
                 CategoryPill(
                     text = c.n,
                     color = c.c,
                     isActive = selCat == c.n,
-                    onClick = { selCat = c.n },
-                    textColor = OmniText // Usage that likely caused error before
+                    textColor = OmniText, // Explicit parameter
+                    onClick = { selCat = c.n } // Trailing lambda logic
                 )
             }
         }

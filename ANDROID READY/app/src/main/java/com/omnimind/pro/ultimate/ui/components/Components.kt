@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omnimind.pro.ultimate.ui.theme.*
@@ -17,10 +18,10 @@ import com.omnimind.pro.ultimate.ui.theme.*
 @Composable
 fun CategoryPill(
     text: String,
-    color: String, // Hex string
+    color: String,
     isActive: Boolean,
-    onClick: () -> Unit,
-    textColor: Color = OmniTextDim // FIX: Added textColor parameter with default
+    textColor: Color = OmniTextDim, // Moved before lambda
+    onClick: () -> Unit // Lambda last for idiomatic usage
 ) {
     val hex = try { Color(android.graphics.Color.parseColor(color)) } catch(e: Exception) { OmniAccent }
 
@@ -35,7 +36,7 @@ fun CategoryPill(
         Text(
             text = text,
             fontSize = 12.sp,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            fontWeight = FontWeight.Bold,
             color = if (isActive) OmniBg else textColor
         )
     }
