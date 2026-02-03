@@ -239,7 +239,7 @@
                             <span style="font-size:0.6rem; font-weight:800; color:${this.getCol(n.cat)}; letter-spacing:1px;">${n.cat.toUpperCase()}</span>
                             ${n.due ? `<span style="font-size:0.65rem; color:var(--text-dim); font-weight:600;">⏰ ${new Date(n.due).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span>` : ''}
                         </div>
-                        <div style="line-height:1.6; white-space:pre-wrap;">${this.parseMD(displayTxt)}</div>
+                        <div style="line-height:1.6; white-space:pre-wrap;">${this.esc(displayTxt)}</div>
                         ${needsTrunc ? `<span class="read-more" onclick="app.toggleExpand(${n.id})">${isExpanded?'SHOW LESS':'READ MORE'}</span>`:''}
                         <div style="position:absolute; top:15px; right:45px; cursor:pointer;" onclick="app.togglePin(${n.id})">
                             ${n.pinned ? '📌' : ''}
@@ -550,19 +550,7 @@
             },
             wipe() { if(confirm("DANGER: Wipe all memories?")) { localStorage.clear(); location.reload(); } },
             getCol(n) { return (this.cats.find(c => c.n === n) || {c: '#fff'}).c; },
-            esc(s) { const p = document.createElement('p'); p.textContent = s; return p.innerHTML; },
-            
-            parseMD(text) {
-                let html = this.esc(text);
-                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                html = html.replace(/__(.*?)__/g, '<u>$1</u>');
-                html = html.replace(/`(.*?)`/g, '<code style="background:var(--glass); padding:2px 4px; border-radius:4px;">$1</code>');
-                html = html.replace(/\[(.*?)\]\((https?:\/\/[^\"]*?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent);">$1</a>');
-                html = html.replace(/^# (.*$)/gm, '<h3 style="margin:5px 0;">$1</h3>');
-                html = html.replace(/^\- (.*$)/gm, '• $1<br>');
-                return html;
-            }
+            esc(s) { const p = document.createElement('p'); p.textContent = s; return p.innerHTML; }
         };
         app.init();
     </script>

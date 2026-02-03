@@ -1,5 +1,0 @@
-<resources>
-    <style name="Theme.OmniMindPro" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">#05070a</item>
-    </style>
-</resources>
