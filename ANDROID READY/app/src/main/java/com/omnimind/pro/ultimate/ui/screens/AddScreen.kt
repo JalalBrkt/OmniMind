@@ -1,80 +1,87 @@
 package com.omnimind.pro.ultimate.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.omnimind.pro.ultimate.DataRepository
-import com.omnimind.pro.ultimate.Note
-import com.omnimind.pro.ultimate.ui.components.FilterPill
+import com.omnimind.pro.ultimate.data.Category
+import com.omnimind.pro.ultimate.data.Note
+import com.omnimind.pro.ultimate.ui.components.CategoryPill
 import com.omnimind.pro.ultimate.ui.theme.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddScreen(repo: DataRepository) {
+fun AddScreen(
+    cats: List<Category>,
+    onSave: (Note) -> Unit
+) {
     var txt by remember { mutableStateOf("") }
-    var selectedCat by remember { mutableStateOf("General") }
+    var selCat by remember { mutableStateOf("General") }
+    var due by remember { mutableStateOf("") }
 
-    val cats = repo.data.cats
-
-    Column(
-        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(20.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
-        ) {
-            Text("SELECT CLUSTER", color = TextDimColor, fontSize = 10.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-            Text("MANAGE", color = AccentColor, fontSize = 10.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.clickable { /* Manage cats */ })
-        }
-
-        Row(modifier = Modifier.horizontalScroll(rememberScrollState()).padding(bottom = 15.dp)) {
-            cats.forEach { cat ->
-                FilterPill(cat.n, selectedCat == cat.n) { selectedCat = cat.n }
+    Column(modifier = Modifier.padding(20.dp)) {
+        // Categories
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            cats.forEach { c ->
+                CategoryPill(
+                    text = c.n,
+                    color = c.c,
+                    isActive = selCat == c.n,
+                    textColor = OmniText, // Explicit parameter
+                    onClick = { selCat = c.n } // Trailing lambda logic
+                )
             }
         }
 
-        OutlinedTextField(
+        Spacer(modifier = Modifier.height(15.dp))
+
+        if (selCat == "Tasks") {
+            BasicTextField(
+                value = due,
+                onValueChange = { due = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(OmniGlass, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                    .padding(18.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(color = OmniText),
+                cursorBrush = SolidColor(OmniAccent),
+                decorationBox = { inner -> if(due.isEmpty()) Text("Due Date (YYYY-MM-DD HH:MM)...", color=OmniTextDim) else inner() }
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+        }
+
+        BasicTextField(
             value = txt,
             onValueChange = { txt = it },
-            placeholder = { Text("What did you learn today?", color = TextDimColor) },
-            modifier = Modifier.fillMaxWidth().weight(1f).padding(bottom = 15.dp),
-            shape = RoundedCornerShape(18.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = GlassBorder,
-                focusedBorderColor = AccentColor,
-                unfocusedBorderColor = GlassBorder,
-                textColor = TextColor,
-                cursorColor = AccentColor
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(OmniGlass, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                .padding(18.dp),
+            textStyle = androidx.compose.ui.text.TextStyle(color = OmniText),
+            cursorBrush = SolidColor(OmniAccent),
+            decorationBox = { inner -> if(txt.isEmpty()) Text("What did you learn today?", color=OmniTextDim) else inner() }
         )
 
         Button(
             onClick = {
-                if (txt.isNotBlank()) {
-                    val note = Note(
-                        txt = txt,
-                        cat = selectedCat,
-                        due = if (selectedCat == "Tasks") LocalDateTime.now().plusDays(1).format(DateTimeFormatter.ISO_DATE_TIME) else null
-                    )
-                    repo.addNote(note)
+                if(txt.isNotEmpty()) {
+                    onSave(Note(txt = txt, cat = selCat, due = if(selCat=="Tasks") due else null))
                     txt = ""
+                    due = ""
                 }
             },
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
+            colors = ButtonDefaults.buttonColors(containerColor = OmniAccent),
+            modifier = Modifier.fillMaxWidth().padding(top = 15.dp)
         ) {
-            Text("Lock into Vault", color = BgColor, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            Text("Lock into Vault", color = OmniBg)
         }
     }
 }
