@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
             ) { pad ->
                 Box(modifier = Modifier.padding(pad)) {
                     when(screen) {
-                        "Vault" -> VaultScreen(notes, cats)
+                        "Vault" -> VaultScreen(notes, cats) { repo.save(notes, cats) }
                         "Add" -> AddScreen(cats) { n ->
                             notes.add(0, n)
                             repo.save(notes, cats)

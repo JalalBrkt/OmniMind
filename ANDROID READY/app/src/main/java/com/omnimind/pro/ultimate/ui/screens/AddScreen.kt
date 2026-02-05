@@ -12,11 +12,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.omnimind.pro.ultimate.data.Category
 import com.omnimind.pro.ultimate.data.Note
 import com.omnimind.pro.ultimate.ui.components.CategoryPill
@@ -25,16 +27,35 @@ import java.util.Calendar
 
 @Composable
 fun AddScreen(
-    cats: List<Category>,
+    cats: MutableList<Category>,
     onSave: (Note) -> Unit
 ) {
     var txt by remember { mutableStateOf("") }
     var selCat by remember { mutableStateOf("General") }
     var due by remember { mutableStateOf("") }
+    var showCatMgr by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    if (showCatMgr) {
+        CategoryManagerDialog(
+            cats = cats,
+            onDismiss = { showCatMgr = false },
+            onUpdate = { /* Triggered */ }
+        )
+    }
+
     Column(modifier = Modifier.padding(20.dp)) {
-        // Categories
+        // Categories Header
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("SELECT CLUSTER", color = OmniTextDim, fontSize = 10.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            Text("MANAGE", color = OmniAccent, fontSize = 10.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.clickable { showCatMgr = true })
+        }
+
+        // Categories List
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             cats.forEach { c ->
                 CategoryPill(
