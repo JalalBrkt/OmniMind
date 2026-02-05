@@ -131,6 +131,11 @@ fun NoteCard(
     onPin: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val words = n.txt.split("\\s+".toRegex())
+    val isLong = words.size > 50
+    val displayTxt = if (isLong && !expanded) words.take(50).joinToString(" ") + "..." else n.txt
 
     Box(modifier = Modifier
         .padding(bottom=15.dp)
@@ -147,7 +152,20 @@ fun NoteCard(
                 if(n.pinned) Text("📌", fontSize = 12.sp)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(n.txt, color = OmniText)
+
+            Text(displayTxt, color = OmniText)
+
+            if (isLong) {
+                Text(
+                    text = if(expanded) "SHOW LESS" else "READ MORE",
+                    color = OmniAccent,
+                    fontSize = 10.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .clickable { expanded = !expanded }
+                )
+            }
         }
 
         Box(modifier = Modifier.align(Alignment.TopEnd)) {
