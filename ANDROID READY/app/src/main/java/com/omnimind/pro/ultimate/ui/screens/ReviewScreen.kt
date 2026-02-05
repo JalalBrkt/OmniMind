@@ -7,6 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -34,27 +35,41 @@ fun ReviewScreen(
     cats: List<Category>
 ) {
     var filter by remember { mutableStateOf("All") }
-    // Initialize pool as empty, will fill on effect
     var pool by remember { mutableStateOf(listOf<Note>()) }
     var index by remember { mutableStateOf(0) }
     var offsetX by remember { mutableStateOf(0f) }
 
-    // Reshuffle every time the screen is composed or filter changes
+    // For truncation logic inside the card
+    var cardExpanded by remember { mutableStateOf(false) }
+
+    // Reshuffle on entry or filter change
     LaunchedEffect(filter, Unit) {
         val filtered = if(filter == "All") notes else notes.filter { it.cat == filter }
         pool = filtered.shuffled()
         index = 0
         offsetX = 0f
+        cardExpanded = false
     }
 
     fun nextCard() {
-         if (pool.isNotEmpty()) index = (index + 1) % pool.size
-         offsetX = 0f
+         if (pool.isNotEmpty()) {
+             if (index >= pool.size - 1) {
+                 pool = pool.shuffled()
+                 index = 0
+             } else {
+                 index++
+             }
+             offsetX = 0f
+             cardExpanded = false
+         }
     }
 
     fun prevCard() {
-        if (pool.isNotEmpty()) index = if(index - 1 < 0) pool.size - 1 else index - 1
-        offsetX = 0f
+        if (pool.isNotEmpty()) {
+            index = if(index - 1 < 0) pool.size - 1 else index - 1
+            offsetX = 0f
+            cardExpanded = false
+        }
     }
 
     Column(modifier = Modifier.padding(20.dp).fillMaxSize()) {
@@ -92,6 +107,10 @@ fun ReviewScreen(
                 if (n != null) {
                     val catColor = try { Color(android.graphics.Color.parseColor(cats.find { it.n == n.cat }?.c ?: "#38bdf8")) } catch(e:Exception){ OmniAccent }
 
+                    val words = n.txt.split("\\s+".toRegex())
+                    val isLong = words.size > 50
+                    val displayTxt = if (isLong && !cardExpanded) words.take(50).joinToString(" ") + "..." else n.txt
+
                     // Card (drawn first)
                     Box(
                         modifier = Modifier
@@ -116,12 +135,27 @@ fun ReviewScreen(
                                 }
                             }
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.verticalScroll(rememberScrollState())
+                        ) {
                             Box(modifier = Modifier.fillMaxWidth().height(6.dp).background(catColor, RoundedCornerShape(50)))
                             Spacer(modifier = Modifier.height(20.dp))
                             Text(n.cat.uppercase(), color = OmniTextDim, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                             Spacer(modifier = Modifier.height(20.dp))
-                            Text(n.txt, color = OmniText, fontSize = 18.sp, lineHeight = 28.sp)
+
+                            Text(displayTxt, color = OmniText, fontSize = 18.sp, lineHeight = 28.sp)
+
+                            if (isLong) {
+                                Text(
+                                    text = if(cardExpanded) "SHOW LESS" else "READ MORE",
+                                    color = OmniAccent,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .padding(top = 15.dp, bottom = 15.dp)
+                                        .clickable { cardExpanded = !cardExpanded }
+                                )
+                            }
                         }
 
                         Text(
@@ -133,21 +167,18 @@ fun ReviewScreen(
                     }
 
                     // Arrows (drawn last = on top)
-                    // Left Arrow
                     Box(modifier = Modifier.align(Alignment.CenterStart)) {
                          IconButton(onClick = { prevCard() }) {
                             Icon(Icons.Default.KeyboardArrowLeft, "Previous", tint = OmniTextDim, modifier = Modifier.size(48.dp))
                         }
                     }
 
-                    // Right Arrow
                     Box(modifier = Modifier.align(Alignment.CenterEnd)) {
                         IconButton(onClick = { nextCard() }) {
                              Icon(Icons.Default.KeyboardArrowRight, "Next", tint = OmniTextDim, modifier = Modifier.size(48.dp))
                         }
                     }
                 } else {
-                    // Safe reset if index became invalid during shuffle
                     LaunchedEffect(pool) { index = 0 }
                 }
             }
