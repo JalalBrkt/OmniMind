@@ -31,36 +31,67 @@ fun CategoryManagerDialog(
 ) {
     var newCatName by remember { mutableStateOf("") }
     var newCatColor by remember { mutableStateOf("#38bdf8") }
-    val systemCats = listOf("General", "Tasks", "Wisdom", "Code") // Protecting default ones
+    val systemCats = listOf("General", "Tasks", "Wisdom", "Code")
+    val lockedCats = listOf("Tasks") // Only lock Tasks from color editing as requested
+    val colors = listOf("#38bdf8", "#fbbf24", "#10b981", "#ef4444", "#a855f7", "#ec4899", "#f97316", "#64748b")
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = OmniPanel,
         title = { Text("Manage Clusters", color = OmniText) },
         text = {
-            Column(modifier = Modifier.height(300.dp)) {
+            Column(modifier = Modifier.height(400.dp)) {
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(cats) { c ->
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 5.dp)
                                 .background(OmniGlass, RoundedCornerShape(10.dp))
-                                .padding(10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                                .padding(10.dp)
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(modifier = Modifier.size(20.dp).background(try{Color(android.graphics.Color.parseColor(c.c))}catch(e:Exception){OmniAccent}, RoundedCornerShape(50)))
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(c.n, color = OmniText)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(modifier = Modifier.size(20.dp).background(try{Color(android.graphics.Color.parseColor(c.c))}catch(e:Exception){OmniAccent}, RoundedCornerShape(50)))
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(c.n, color = OmniText, fontSize = 14.sp)
+                                }
+                                if (!systemCats.contains(c.n)) {
+                                    IconButton(onClick = {
+                                        cats.remove(c)
+                                        onUpdate()
+                                    }, modifier = Modifier.size(24.dp)) {
+                                        Icon(Icons.Default.Close, "Delete", tint = OmniDanger)
+                                    }
+                                }
                             }
-                            if (!systemCats.contains(c.n)) {
-                                IconButton(onClick = {
-                                    cats.remove(c)
-                                    onUpdate()
-                                }) {
-                                    Icon(Icons.Default.Close, "Delete", tint = OmniDanger)
+
+                            // Color Picker Row (if not locked)
+                            if (!lockedCats.contains(c.n)) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    colors.forEach { col ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .background(try{Color(android.graphics.Color.parseColor(col))}catch(e:Exception){Color.Gray}, RoundedCornerShape(50))
+                                                .border(if(c.c == col) 2.dp else 0.dp, OmniText, RoundedCornerShape(50))
+                                                .clickable {
+                                                    val idx = cats.indexOf(c)
+                                                    if (idx != -1) {
+                                                        cats[idx] = c.copy(c = col)
+                                                        onUpdate()
+                                                    }
+                                                }
+                                        )
+                                    }
                                 }
                             }
                         }

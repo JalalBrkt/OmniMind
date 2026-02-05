@@ -36,19 +36,21 @@ fun VaultScreen(
     var search by remember { mutableStateOf("") }
     var editingNote by remember { mutableStateOf<Note?>(null) }
 
+    // Force recomposition signal
+    var updateTrigger by remember { mutableStateOf(0) }
+
     if (editingNote != null) {
         EditNoteDialog(
             note = editingNote!!,
             cats = cats,
             onDismiss = { editingNote = null },
             onSave = { txt, cat, due, pinned ->
-                editingNote!!.apply {
-                    this.txt = txt
-                    this.cat = cat
-                    this.due = due
-                    this.pinned = pinned
+                val index = notes.indexOf(editingNote!!)
+                if (index != -1) {
+                    notes[index] = editingNote!!.copy(txt=txt, cat=cat, due=due, pinned=pinned)
+                    onUpdate()
+                    updateTrigger++
                 }
-                onUpdate()
                 editingNote = null
             }
         )
@@ -89,22 +91,30 @@ fun VaultScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        val filtered = notes.filter {
-            (filter == "All" || it.cat == filter) &&
-            (search.isEmpty() || it.txt.contains(search, ignoreCase = true))
-        }.sortedByDescending { it.pinned }
+        // Dependent on updateTrigger to force sort re-eval
+        val filtered = remember(notes, filter, search, updateTrigger) {
+             notes.filter {
+                (filter == "All" || it.cat == filter) &&
+                (search.isEmpty() || it.txt.contains(search, ignoreCase = true))
+            }.sortedByDescending { it.pinned }
+        }
 
         LazyColumn {
-            items(filtered) { n ->
+            items(filtered, key = { it.id }) { n ->
                 NoteCard(n, cats,
                     onEdit = { editingNote = n },
                     onDelete = {
                         notes.remove(n)
                         onUpdate()
+                        updateTrigger++
                     },
                     onPin = {
-                        n.pinned = !n.pinned
-                        onUpdate()
+                        val index = notes.indexOf(n)
+                        if(index != -1) {
+                            notes[index] = n.copy(pinned = !n.pinned)
+                            onUpdate()
+                            updateTrigger++
+                        }
                     }
                 )
             }
