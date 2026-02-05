@@ -1,5 +1,7 @@
 /* OmniMind Pro Service Worker (PWABuilder Optimized) */
 const CACHE_NAME = 'omnimind-v11-offline';
+/* OmniMind Pro Service Worker (PWABuilder Standard) */
+const CACHE_NAME = 'omnimind-v10-offline';
 const OFFLINE_URL = 'index.html';
 
 const ASSETS_TO_CACHE = [
@@ -46,6 +48,14 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         } catch (error) {
           // If network fails, serve offline page
+          const preloadResponse = await event.preloadResponse;
+          if (preloadResponse) {
+            return preloadResponse;
+          }
+
+          const networkResponse = await fetch(event.request);
+          return networkResponse;
+        } catch (error) {
           console.log('[ServiceWorker] Fetch failed; returning offline page instead.', error);
           const cache = await caches.open(CACHE_NAME);
           const cachedResponse = await cache.match(OFFLINE_URL);
@@ -55,6 +65,7 @@ self.addEventListener('fetch', (event) => {
     );
   } else {
     // For other assets, try cache first, then network
+    // Cache-First Strategy for assets
     event.respondWith(
       caches.match(event.request).then((response) => {
         return response || fetch(event.request);
