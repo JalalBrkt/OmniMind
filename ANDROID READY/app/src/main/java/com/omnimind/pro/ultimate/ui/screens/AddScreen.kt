@@ -1,5 +1,7 @@
 package com.omnimind.pro.ultimate.ui.screens
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.background
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -53,17 +55,25 @@ fun AddScreen(
         Spacer(modifier = Modifier.height(15.dp))
 
         if (selCat == "Tasks") {
-            BasicTextField(
-                value = due,
-                onValueChange = { due = it },
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(OmniGlass, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
-                    .padding(18.dp),
-                textStyle = androidx.compose.ui.text.TextStyle(color = OmniText),
-                cursorBrush = SolidColor(OmniAccent),
-                decorationBox = { inner -> if(due.isEmpty()) Text("Due Date (YYYY-MM-DD HH:MM)...", color=OmniTextDim) else inner() }
-            )
+                    .clickable {
+                        val c = Calendar.getInstance()
+                        DatePickerDialog(context, { _, y, m, d ->
+                            TimePickerDialog(context, { _, h, min ->
+                                due = String.format("%04d-%02d-%02dT%02d:%02d", y, m + 1, d, h, min)
+                            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show()
+                        }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show()
+                    }
+                    .padding(18.dp)
+            ) {
+                Text(
+                    text = if (due.isEmpty()) "Set Due Date..." else "Due: $due",
+                    color = if (due.isEmpty()) OmniTextDim else OmniAccent
+                )
+            }
             Spacer(modifier = Modifier.height(15.dp))
         }
 
