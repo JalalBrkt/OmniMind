@@ -39,7 +39,6 @@ class MainActivity : ComponentActivity() {
                 containerColor = OmniBg,
                 bottomBar = {
                     NavigationBar(containerColor = OmniPanel) {
-                        val items = listOf("Vault" to Icons.Default.Home, "Add" to Icons.Default.Add, "Map" to Icons.Default.Info)
                         val items = listOf(
                             "Vault" to Icons.Default.Home,
                             "Add" to Icons.Default.Add,
@@ -61,7 +60,6 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.padding(pad)) {
                     when(screen) {
                         "Vault" -> VaultScreen(notes, cats)
-                        "Add" -> AddScreen(cats) { n -> notes.add(0, n); repo.save(notes, cats); screen="Vault" }
                         "Add" -> AddScreen(cats) { n ->
                             notes.add(0, n)
                             repo.save(notes, cats)
