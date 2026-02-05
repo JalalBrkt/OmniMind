@@ -1,6 +1,7 @@
 package com.omnimind.pro.ultimate
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,18 +18,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.omnimind.pro.ultimate.data.Category
+import com.omnimind.pro.ultimate.data.Note
 import com.omnimind.pro.ultimate.data.Repository
 import com.omnimind.pro.ultimate.ui.screens.*
 import com.omnimind.pro.ultimate.ui.theme.OmniAccent
 import com.omnimind.pro.ultimate.ui.theme.OmniBg
 import com.omnimind.pro.ultimate.ui.theme.OmniPanel
 import com.omnimind.pro.ultimate.ui.theme.OmniText
+import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            try {
+                val sw = StringWriter()
+                e.printStackTrace(PrintWriter(sw))
+                val log = File(filesDir, "crash_log.txt")
+                log.writeText(sw.toString())
+                Log.e("OmniCrash", "Crash recorded", e)
+            } catch (ioe: Exception) {
+                ioe.printStackTrace()
+            }
+            android.os.Process.killProcess(android.os.Process.myPid())
+        }
+
         val repo = Repository(this)
-        val (notes, cats) = repo.load()
+        val (loadedNotes, loadedCats) = repo.load()
+
+        // Use mutableStateListOf for reactive updates
+        val notes = mutableStateListOf<Note>().apply { addAll(loadedNotes) }
+        val cats = mutableStateListOf<Category>().apply { addAll(loadedCats) }
 
         setContent {
             var screen by remember { mutableStateOf("Vault") }
@@ -64,7 +88,7 @@ class MainActivity : ComponentActivity() {
                             notes.add(0, n)
                             repo.save(notes, cats)
                             Toast.makeText(context, "Locked into Vault", Toast.LENGTH_SHORT).show()
-                            // screen="Vault" removed to keep user on Add screen
+                            screen = "Vault" // Reverted to navigate back
                         }
                         "Review" -> ReviewScreen(notes, cats)
                         "Map" -> MindMapScreen(cats, notes)
