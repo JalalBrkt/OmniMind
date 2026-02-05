@@ -1,6 +1,7 @@
 package com.omnimind.pro.ultimate.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -91,8 +92,7 @@ fun ReviewScreen(
                                         }
                                         offsetX = 0f
                                     }
-                                ) { change, dragAmount ->
-                                    change.consume()
+                                ) { _, dragAmount ->
                                     offsetX += dragAmount
                                 }
                             }
