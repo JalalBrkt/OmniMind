@@ -123,7 +123,10 @@
 
     <section id="view-review" class="app-view">
         <div class="cat-row" id="r-filters"></div>
-        <div id="flash-stage"></div>
+        <div id="flash-stage" style="position:relative;">
+            <div onclick="app.swipe(-1)" style="position:absolute; left:0; top:50%; transform:translateY(-50%); z-index:100; font-size:2rem; padding:20px; cursor:pointer; opacity:0.5; color:var(--text-dim);">‹</div>
+            <div onclick="app.swipe(1)" style="position:absolute; right:0; top:50%; transform:translateY(-50%); z-index:100; font-size:2rem; padding:20px; cursor:pointer; opacity:0.5; color:var(--text-dim);">›</div>
+        </div>
     </section>
 
     <section id="view-mind" class="app-view">

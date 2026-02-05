@@ -7,6 +7,11 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,6 +42,16 @@ fun ReviewScreen(
         val filtered = if(filter == "All") notes else notes.filter { it.cat == filter }
         pool = filtered.shuffled()
         index = 0
+        offsetX = 0f
+    }
+
+    fun nextCard() {
+         if (pool.isNotEmpty()) index = (index + 1) % pool.size
+         offsetX = 0f
+    }
+
+    fun prevCard() {
+        if (pool.isNotEmpty()) index = if(index - 1 < 0) pool.size - 1 else index - 1
         offsetX = 0f
     }
 
@@ -75,6 +90,7 @@ fun ReviewScreen(
                 if (n != null) {
                     val catColor = try { Color(android.graphics.Color.parseColor(cats.find { it.n == n.cat }?.c ?: "#38bdf8")) } catch(e:Exception){ OmniAccent }
 
+                    // Card (drawn first)
                     Box(
                         modifier = Modifier
                             .offset(x = (offsetX / 2).dp)
@@ -87,10 +103,11 @@ fun ReviewScreen(
                             .pointerInput(Unit) {
                                 detectHorizontalDragGestures(
                                     onDragEnd = {
-                                        if (abs(offsetX) > 300) {
-                                            index = (index + 1) % pool.size
+                                        if (abs(offsetX) > 150) {
+                                            if (offsetX > 0) prevCard() else nextCard()
+                                        } else {
+                                            offsetX = 0f
                                         }
-                                        offsetX = 0f
                                     }
                                 ) { _, dragAmount ->
                                     offsetX += dragAmount
@@ -112,8 +129,22 @@ fun ReviewScreen(
                             modifier = Modifier.align(Alignment.BottomCenter)
                         )
                     }
+
+                    // Arrows (drawn last = on top)
+                    // Left Arrow
+                    Box(modifier = Modifier.align(Alignment.CenterStart)) {
+                         IconButton(onClick = { prevCard() }) {
+                            Icon(Icons.Default.KeyboardArrowLeft, "Previous", tint = OmniTextDim, modifier = Modifier.size(48.dp))
+                        }
+                    }
+
+                    // Right Arrow
+                    Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                        IconButton(onClick = { nextCard() }) {
+                             Icon(Icons.Default.KeyboardArrowRight, "Next", tint = OmniTextDim, modifier = Modifier.size(48.dp))
+                        }
+                    }
                 } else {
-                    // Reset if index out of bounds
                     LaunchedEffect(Unit) { index = 0 }
                 }
             }
