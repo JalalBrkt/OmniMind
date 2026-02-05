@@ -1,10 +1,13 @@
 package com.omnimind.pro.ultimate
 
 import android.Manifest
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -50,6 +54,33 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             // Permission granted
+        }
+    }
+
+    // Activity Result Launchers for File Operations
+    private var pendingExport = false
+    private lateinit var repo: Repository
+    private lateinit var notesRef: MutableList<Note>
+    private lateinit var catsRef: MutableList<Category>
+
+    private val exportLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
+        if (uri != null) {
+            repo.exportToUri(uri, notesRef, catsRef)
+            Toast.makeText(this, "Exported Successfully", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri != null) {
+            val wrapper = repo.importFromUri(uri)
+            if (wrapper != null) {
+                notesRef.clear(); notesRef.addAll(wrapper.notes)
+                catsRef.clear(); catsRef.addAll(wrapper.cats)
+                repo.save(notesRef, catsRef)
+                Toast.makeText(this, "Imported Successfully", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Import Failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -90,15 +121,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val repo = Repository(this)
+        repo = Repository(this)
         val (loadedNotes, loadedCats) = repo.load()
 
         val notes = mutableStateListOf<Note>().apply { addAll(loadedNotes) }
         val cats = mutableStateListOf<Category>().apply { addAll(loadedCats) }
 
+        notesRef = notes
+        catsRef = cats
+
         setContent {
             var screen by remember { mutableStateOf("Vault") }
-            var showStats by remember { mutableStateOf(false) }
+            var showSettings by remember { mutableStateOf(false) }
             val context = LocalContext.current
 
             // Notification Loop
@@ -122,8 +156,35 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            if (showSettings) {
+                SettingsDialog(
+                    onDismiss = { showSettings = false },
+                    onExport = { exportLauncher.launch("omnimind_backup.json") },
+                    onImport = { importLauncher.launch(arrayOf("application/json")) },
+                    onWipe = {
+                        notes.clear()
+                        cats.clear(); cats.addAll(com.omnimind.pro.ultimate.data.DataStore.initialCats)
+                        repo.save(notes, cats)
+                        Toast.makeText(context, "Data Wiped", Toast.LENGTH_SHORT).show()
+                        showSettings = false
+                    }
+                )
+            }
+
             Scaffold(
                 containerColor = OmniBg,
+                topBar = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top=15.dp, start=20.dp, end=20.dp, bottom=10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("OMNIMIND", color = OmniText, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold, fontSize = 16.sp, letterSpacing = 2.sp)
+                        IconButton(onClick = { showSettings = true }) {
+                            Icon(Icons.Default.Settings, "Settings", tint = OmniTextDim)
+                        }
+                    }
+                },
                 bottomBar = {
                     NavigationBar(containerColor = OmniPanel) {
                         val items = listOf(
