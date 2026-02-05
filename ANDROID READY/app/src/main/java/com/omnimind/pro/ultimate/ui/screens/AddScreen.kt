@@ -1,5 +1,6 @@
 package com.omnimind.pro.ultimate.ui.screens
 
+import androidx.compose.foundation.background
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.foundation.background
@@ -41,6 +42,8 @@ fun AddScreen(
                     text = c.n,
                     color = c.c,
                     isActive = selCat == c.n,
+                    textColor = OmniText, // Explicit parameter
+                    onClick = { selCat = c.n } // Trailing lambda logic
                     textColor = OmniText,
                     onClick = { selCat = c.n }
                 )
@@ -50,6 +53,20 @@ fun AddScreen(
         Spacer(modifier = Modifier.height(15.dp))
 
         if (selCat == "Tasks") {
+            BasicTextField(
+                value = due,
+                onValueChange = { due = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(OmniGlass, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+                    .padding(18.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(color = OmniText),
+                cursorBrush = SolidColor(OmniAccent),
+                decorationBox = { inner -> if(due.isEmpty()) Text("Due Date (YYYY-MM-DD HH:MM)...", color=OmniTextDim) else inner() }
+            )
+            Spacer(modifier = Modifier.height(15.dp))
+        }
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -81,6 +98,7 @@ fun AddScreen(
                 .weight(1f)
                 .background(OmniGlass, androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
                 .padding(18.dp),
+            textStyle = androidx.compose.ui.text.TextStyle(color = OmniText),
             textStyle = TextStyle(color = OmniText),
             cursorBrush = SolidColor(OmniAccent),
             decorationBox = { inner -> if(txt.isEmpty()) Text("What did you learn today?", color=OmniTextDim) else inner() }
