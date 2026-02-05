@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             color-scheme: dark;
@@ -177,11 +177,11 @@
             fStack: [], fIdx: 0, touchX: 0, editId: null, expandedIds: new Set(),
             searchQuery: '',
 
-            init() { 
+            init() {
                 if(!this.cats.find(c => c.n === 'Tasks')) this.cats.push({n: 'Tasks', c: '#ef4444'});
-                this.renderAll(); 
-                this.setupSwipe(); 
-                window.onclick = (e) => { if(!e.target.matches('.dots-btn')) this.closeDrops(); }; 
+                this.renderAll();
+                this.setupSwipe();
+                window.onclick = (e) => { if(!e.target.matches('.dots-btn')) this.closeDrops(); };
 
                 setInterval(() => this.checkTasks(), 30000);
 
@@ -198,21 +198,21 @@
                 }
             },
 
-            nav(id, el) { 
-                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active')); 
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
-                document.getElementById(id).classList.add('active'); 
-                el.classList.add('active'); 
+            nav(id, el) {
+                document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                el.classList.add('active');
                 if(id === 'view-review') this.initFlash();
                 if(id === 'view-mind') this.renderMap();
             },
 
-            renderAll() { 
-                localStorage.setItem('omni_v9_notes', JSON.stringify(this.notes)); 
-                localStorage.setItem('omni_v9_cats', JSON.stringify(this.cats)); 
-                this.renderVault(); 
-                this.renderAdd(); 
-                this.renderReviewCats(); 
+            renderAll() {
+                localStorage.setItem('omni_v9_notes', JSON.stringify(this.notes));
+                localStorage.setItem('omni_v9_cats', JSON.stringify(this.cats));
+                this.renderVault();
+                this.renderAdd();
+                this.renderReviewCats();
             },
 
             search(q) { this.searchQuery = q; this.renderVault(); },
@@ -221,7 +221,7 @@
                 document.getElementById('v-filters').innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.vFilter === f ? 'active' : ''}" onclick="app.vFilter='${f}';app.renderVault()">${f}</div>`).join('');
                 const list = document.getElementById('v-list');
                 let filtered = this.vFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.vFilter);
-                
+
                 // Sort by Pinned then Date
                 filtered.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.id - a.id);
 
@@ -239,7 +239,7 @@
                             <span style="font-size:0.6rem; font-weight:800; color:${this.getCol(n.cat)}; letter-spacing:1px;">${n.cat.toUpperCase()}</span>
                             ${n.due ? `<span style="font-size:0.65rem; color:var(--text-dim); font-weight:600;">⏰ ${new Date(n.due).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span>` : ''}
                         </div>
-                        <div style="line-height:1.6; white-space:pre-wrap;">${this.esc(displayTxt)}</div>
+                        <div style="line-height:1.6; white-space:pre-wrap;">${this.parseMD(displayTxt)}</div>
                         ${needsTrunc ? `<span class="read-more" onclick="app.toggleExpand(${n.id})">${isExpanded?'SHOW LESS':'READ MORE'}</span>`:''}
                         <div style="position:absolute; top:15px; right:45px; cursor:pointer;" onclick="app.togglePin(${n.id})">
                             ${n.pinned ? '📌' : ''}
@@ -271,7 +271,7 @@
             toggleExpand(id) { if(this.expandedIds.has(id)) this.expandedIds.delete(id); else this.expandedIds.add(id); this.renderVault(); },
             openDrop(e, id) { e.stopPropagation(); this.closeDrops(); document.getElementById(`dr-${id}`).style.display = 'block'; },
             closeDrops() { document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none'); },
-            
+
             toggleEditDate() {
                 const cat = document.getElementById('edit-fact-cat').value;
                 document.getElementById('edit-fact-date').style.display = cat === 'Tasks' ? 'block' : 'none';
@@ -287,18 +287,18 @@
                 document.getElementById('edit-fact-modal').style.display = 'flex';
             },
 
-            commitEdit() { 
-                const n = this.notes.find(x => x.id === this.editId); 
-                n.txt = document.getElementById('edit-fact-input').value; 
-                n.cat = document.getElementById('edit-fact-cat').value; 
+            commitEdit() {
+                const n = this.notes.find(x => x.id === this.editId);
+                n.txt = document.getElementById('edit-fact-input').value;
+                n.cat = document.getElementById('edit-fact-cat').value;
                 if(n.cat === 'Tasks') {
                     n.due = document.getElementById('edit-fact-date').value;
                     n.notified = false;
                 } else {
                     delete n.due;
                 }
-                this.closeModal('edit-fact-modal'); 
-                this.renderAll(); 
+                this.closeModal('edit-fact-modal');
+                this.renderAll();
             },
 
             del(id) { if(confirm("Discard from Vault?")) { this.notes = this.notes.filter(n => n.id !== id); this.renderAll(); } },
@@ -307,21 +307,21 @@
                 document.getElementById('a-cats').innerHTML = this.cats.map(c => `<div class="cat-pill ${this.aSel === c.n ? 'active' : ''}" onclick="app.aSel='${c.n}';app.renderAdd()">${c.n}</div>`).join('');
                 document.getElementById('a-date').style.display = this.aSel === 'Tasks' ? 'block' : 'none';
             },
-            
-            save() { 
-                const val = document.getElementById('a-input').value; 
-                if(!val) return; 
+
+            save() {
+                const val = document.getElementById('a-input').value;
+                if(!val) return;
                 const note = {id: Date.now(), txt: val, cat: this.aSel};
                 if(this.aSel === 'Tasks') {
                     const d = document.getElementById('a-date').value;
                     if(d) note.due = d;
                 }
                 this.notes.unshift(note);
-                document.getElementById('a-input').value = ''; 
+                document.getElementById('a-input').value = '';
                 document.getElementById('a-date').value = '';
-                this.renderAll(); 
-                const t = document.getElementById('toast'); t.style.display = 'block'; 
-                setTimeout(() => t.style.display = 'none', 1500); 
+                this.renderAll();
+                const t = document.getElementById('toast'); t.style.display = 'block';
+                setTimeout(() => t.style.display = 'none', 1500);
             },
 
             reqNotif() {
@@ -396,18 +396,18 @@
                 }
             },
 
-            initFlash() { 
-                const pool = this.rFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.rFilter); 
-                this.fStack = [...pool].sort(() => Math.random() - 0.5); 
-                this.fIdx = 0; 
-                this.renderReviewCats(); 
-                this.renderCard(); 
+            initFlash() {
+                const pool = this.rFilter === 'All' ? this.notes : this.notes.filter(n => n.cat === this.rFilter);
+                this.fStack = [...pool].sort(() => Math.random() - 0.5);
+                this.fIdx = 0;
+                this.renderReviewCats();
+                this.renderCard();
             },
 
             renderReviewCats() { document.getElementById('r-filters').innerHTML = ['All', ...this.cats.map(c => c.n)].map(f => `<div class="cat-pill ${this.rFilter === f ? 'active' : ''}" onclick="app.rFilter='${f}';app.initFlash()">${f}</div>`).join(''); },
-            
+
             renderCard() {
-                const s = document.getElementById('flash-stage'); 
+                const s = document.getElementById('flash-stage');
                 if(!this.fStack.length) { s.innerHTML = `<div class="tinder-card">No items in this cluster.</div>`; return; }
                 const n = this.fStack[this.fIdx];
                 s.innerHTML = `<div class="tinder-card" id="cur-c" style="border-top: 6px solid ${this.getCol(n.cat)}">
@@ -417,23 +417,23 @@
                 </div>`;
             },
 
-            setupSwipe() { 
-                const s = document.getElementById('flash-stage'); 
-                s.addEventListener('touchstart', e => this.touchX = e.touches[0].clientX); 
-                s.addEventListener('touchend', e => { 
-                    const diff = e.changedTouches[0].clientX - this.touchX; 
-                    if(Math.abs(diff) > 55) this.swipe(diff > 0 ? -1 : 1); 
-                }); 
+            setupSwipe() {
+                const s = document.getElementById('flash-stage');
+                s.addEventListener('touchstart', e => this.touchX = e.touches[0].clientX);
+                s.addEventListener('touchend', e => {
+                    const diff = e.changedTouches[0].clientX - this.touchX;
+                    if(Math.abs(diff) > 55) this.swipe(diff > 0 ? -1 : 1);
+                });
             },
 
-            swipe(dir) { 
-                const next = this.fIdx + dir; 
-                if(next < 0) return; 
-                if(next >= this.fStack.length) { this.initFlash(); return; } 
-                const c = document.getElementById('cur-c'); 
-                c.style.transform = `translateX(${dir * -140}px) rotate(${dir * -12}deg)`; 
-                c.style.opacity = '0'; 
-                setTimeout(() => { this.fIdx = next; this.renderCard(); }, 250); 
+            swipe(dir) {
+                const next = this.fIdx + dir;
+                if(next < 0) return;
+                if(next >= this.fStack.length) { this.initFlash(); return; }
+                const c = document.getElementById('cur-c');
+                c.style.transform = `translateX(${dir * -140}px) rotate(${dir * -12}deg)`;
+                c.style.opacity = '0';
+                setTimeout(() => { this.fIdx = next; this.renderCard(); }, 250);
             },
 
             openCatModal() {
@@ -446,36 +446,36 @@
                 document.getElementById('cat-modal').style.display = 'flex';
             },
 
-            updateCatColor(oldName, newCol) { 
-                const cat = this.cats.find(c => c.n === oldName); 
-                if(cat) cat.c = newCol; 
-                this.renderAll(); 
+            updateCatColor(oldName, newCol) {
+                const cat = this.cats.find(c => c.n === oldName);
+                if(cat) cat.c = newCol;
+                this.renderAll();
             },
 
-            renameCat(oldName, newName) { 
+            renameCat(oldName, newName) {
                 if(!newName || this.cats.find(x => x.n === newName)) return;
                 const cat = this.cats.find(c => c.n === oldName);
-                if(cat) { 
-                    cat.n = newName; 
-                    this.notes.forEach(n => { if(n.cat === oldName) n.cat = newName; }); 
+                if(cat) {
+                    cat.n = newName;
+                    this.notes.forEach(n => { if(n.cat === oldName) n.cat = newName; });
                     if(this.aSel === oldName) this.aSel = newName;
                     this.renderAll(); this.openCatModal();
                 }
             },
 
-            addCat() { 
-                const n = document.getElementById('new-cat-n').value; 
-                const c = document.getElementById('new-cat-c').value; 
-                if(!n || this.cats.find(x => x.n === n)) return; 
-                this.cats.push({n, c}); 
-                document.getElementById('new-cat-n').value = ''; 
-                this.renderAll(); this.openCatModal(); 
+            addCat() {
+                const n = document.getElementById('new-cat-n').value;
+                const c = document.getElementById('new-cat-c').value;
+                if(!n || this.cats.find(x => x.n === n)) return;
+                this.cats.push({n, c});
+                document.getElementById('new-cat-n').value = '';
+                this.renderAll(); this.openCatModal();
             },
 
-            delCat(n) { 
-                this.cats = this.cats.filter(c => c.n !== n); 
-                this.notes.forEach(x => { if(x.cat === n) x.cat = 'General'; }); 
-                this.renderAll(); this.openCatModal(); 
+            delCat(n) {
+                this.cats = this.cats.filter(c => c.n !== n);
+                this.notes.forEach(x => { if(x.cat === n) x.cat = 'General'; });
+                this.renderAll(); this.openCatModal();
             },
 
             openSync() {
@@ -502,7 +502,7 @@
             },
             closeModal(id) { document.getElementById(id).style.display = 'none'; },
 
-            export() { 
+            export() {
                 const cat = document.getElementById('export-cat').value;
                 let data, name = 'omnimind_backup';
                 if(cat === 'All') {
@@ -515,9 +515,9 @@
                 const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${name}.json`; a.click();
             },
 
-            import(e) { 
-                const r = new FileReader(); 
-                r.onload = (ev) => { 
+            import(e) {
+                const r = new FileReader();
+                r.onload = (ev) => {
                     try {
                         const d = JSON.parse(ev.target.result);
                         if(d.type === 'partial') {
@@ -545,12 +545,24 @@
                         this.closeModal('sync-modal');
                         e.target.value = '';
                     } catch(err) { alert("Error reading file."); }
-                }; 
-                r.readAsText(e.target.files[0]); 
+                };
+                r.readAsText(e.target.files[0]);
             },
             wipe() { if(confirm("DANGER: Wipe all memories?")) { localStorage.clear(); location.reload(); } },
             getCol(n) { return (this.cats.find(c => c.n === n) || {c: '#fff'}).c; },
-            esc(s) { const p = document.createElement('p'); p.textContent = s; return p.innerHTML; }
+            esc(s) { const p = document.createElement('p'); p.textContent = s; return p.innerHTML; },
+
+            parseMD(text) {
+                let html = this.esc(text);
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                html = html.replace(/__(.*?)__/g, '<u>$1</u>');
+                html = html.replace(/`(.*?)`/g, '<code style="background:var(--glass); padding:2px 4px; border-radius:4px;">$1</code>');
+                html = html.replace(/\[(.*?)\]\((https?:\/\/[^\"]*?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent);">$1</a>');
+                html = html.replace(/^# (.*$)/gm, '<h3 style="margin:5px 0;">$1</h3>');
+                html = html.replace(/^\- (.*$)/gm, '• $1<br>');
+                return html;
+            }
         };
         app.init();
     </script>
