@@ -25,10 +25,12 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -36,10 +38,7 @@ import com.omnimind.pro.ultimate.data.Category
 import com.omnimind.pro.ultimate.data.Note
 import com.omnimind.pro.ultimate.data.Repository
 import com.omnimind.pro.ultimate.ui.screens.*
-import com.omnimind.pro.ultimate.ui.theme.OmniAccent
-import com.omnimind.pro.ultimate.ui.theme.OmniBg
-import com.omnimind.pro.ultimate.ui.theme.OmniPanel
-import com.omnimind.pro.ultimate.ui.theme.OmniText
+import com.omnimind.pro.ultimate.ui.theme.*
 import kotlinx.coroutines.delay
 import java.io.File
 import java.io.PrintWriter
