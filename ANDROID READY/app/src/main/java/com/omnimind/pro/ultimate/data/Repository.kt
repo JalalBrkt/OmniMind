@@ -1,8 +1,8 @@
 package com.omnimind.pro.ultimate.data
 
 import android.content.Context
+import android.net.Uri
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.File
 
 class Repository(private val context: Context) {
@@ -23,5 +23,26 @@ class Repository(private val context: Context) {
 
     fun save(notes: List<Note>, cats: List<Category>) {
         file.writeText(gson.toJson(Wrapper(notes, cats)))
+    }
+
+    fun exportToUri(uri: Uri, notes: List<Note>, cats: List<Category>) {
+        try {
+            val json = gson.toJson(Wrapper(notes, cats))
+            context.contentResolver.openOutputStream(uri)?.use {
+                it.write(json.toByteArray())
+            }
+        } catch(e: Exception) { e.printStackTrace() }
+    }
+
+    fun importFromUri(uri: Uri): Wrapper? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use {
+                val json = it.bufferedReader().readText()
+                gson.fromJson(json, Wrapper::class.java)
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

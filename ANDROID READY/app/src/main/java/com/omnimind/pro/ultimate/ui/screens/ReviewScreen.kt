@@ -34,11 +34,13 @@ fun ReviewScreen(
     cats: List<Category>
 ) {
     var filter by remember { mutableStateOf("All") }
-    var pool by remember { mutableStateOf(notes.shuffled()) }
+    // Initialize pool as empty, will fill on effect
+    var pool by remember { mutableStateOf(listOf<Note>()) }
     var index by remember { mutableStateOf(0) }
     var offsetX by remember { mutableStateOf(0f) }
 
-    LaunchedEffect(filter) {
+    // Reshuffle every time the screen is composed or filter changes
+    LaunchedEffect(filter, Unit) {
         val filtered = if(filter == "All") notes else notes.filter { it.cat == filter }
         pool = filtered.shuffled()
         index = 0
@@ -145,7 +147,8 @@ fun ReviewScreen(
                         }
                     }
                 } else {
-                    LaunchedEffect(Unit) { index = 0 }
+                    // Safe reset if index became invalid during shuffle
+                    LaunchedEffect(pool) { index = 0 }
                 }
             }
         }
