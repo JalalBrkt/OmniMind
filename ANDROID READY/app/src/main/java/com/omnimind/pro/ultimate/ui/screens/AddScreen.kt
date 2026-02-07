@@ -27,8 +27,10 @@ import java.util.Calendar
 
 @Composable
 fun AddScreen(
+    notes: MutableList<Note>,
     cats: MutableList<Category>,
-    onSave: (Note) -> Unit
+    onSave: (Note) -> Unit,
+    onUpdate: () -> Unit
 ) {
     var txt by remember { mutableStateOf("") }
     var selCat by remember { mutableStateOf("General") }
@@ -39,8 +41,9 @@ fun AddScreen(
     if (showCatMgr) {
         CategoryManagerDialog(
             cats = cats,
+            notes = notes,
             onDismiss = { showCatMgr = false },
-            onUpdate = { /* Triggered */ }
+            onUpdate = onUpdate
         )
     }
 

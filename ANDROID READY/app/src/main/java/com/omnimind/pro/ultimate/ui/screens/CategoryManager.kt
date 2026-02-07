@@ -22,11 +22,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omnimind.pro.ultimate.data.Category
+import com.omnimind.pro.ultimate.data.Note
 import com.omnimind.pro.ultimate.ui.theme.*
 
 @Composable
 fun CategoryManagerDialog(
     cats: MutableList<Category>,
+    notes: MutableList<Note>,
     onDismiss: () -> Unit,
     onUpdate: () -> Unit
 ) {
@@ -69,7 +71,7 @@ fun CategoryManagerDialog(
                                             value = editName,
                                             onValueChange = {
                                                 editName = it
-                                                c.n = it // Direct mutation for simplicity, followed by update
+                                                c.n = it // Direct mutation for simplicity
                                                 onUpdate()
                                             },
                                             textStyle = TextStyle(color = OmniText, fontSize = 14.sp),
@@ -80,6 +82,7 @@ fun CategoryManagerDialog(
                                 }
                                 if (!lockedCats.contains(c.n)) {
                                     IconButton(onClick = {
+                                        notes.removeAll { it.cat == c.n } // Delete associated notes
                                         cats.remove(c)
                                         onUpdate()
                                     }, modifier = Modifier.size(24.dp)) {
