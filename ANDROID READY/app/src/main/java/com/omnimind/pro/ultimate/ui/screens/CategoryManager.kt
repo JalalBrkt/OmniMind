@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omnimind.pro.ultimate.data.Category
@@ -31,8 +32,8 @@ fun CategoryManagerDialog(
 ) {
     var newCatName by remember { mutableStateOf("") }
     var newCatColor by remember { mutableStateOf("#38bdf8") }
-    val systemCats = listOf("General", "Tasks", "Wisdom", "Code")
-    val lockedCats = listOf("Tasks") // Only lock Tasks from color editing as requested
+    // Only lock "Tasks" completely. Others are editable.
+    val lockedCats = listOf("Tasks")
     val colors = listOf("#38bdf8", "#fbbf24", "#10b981", "#ef4444", "#a855f7", "#ec4899", "#f97316", "#64748b")
 
     AlertDialog(
@@ -55,12 +56,29 @@ fun CategoryManagerDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                                     Box(modifier = Modifier.size(20.dp).background(try{Color(android.graphics.Color.parseColor(c.c))}catch(e:Exception){OmniAccent}, RoundedCornerShape(50)))
                                     Spacer(modifier = Modifier.width(10.dp))
-                                    Text(c.n, color = OmniText, fontSize = 14.sp)
+
+                                    // Editable Name if not locked
+                                    if (lockedCats.contains(c.n)) {
+                                        Text(c.n, color = OmniText, fontSize = 14.sp)
+                                    } else {
+                                        var editName by remember { mutableStateOf(c.n) }
+                                        BasicTextField(
+                                            value = editName,
+                                            onValueChange = {
+                                                editName = it
+                                                c.n = it // Direct mutation for simplicity, followed by update
+                                                onUpdate()
+                                            },
+                                            textStyle = TextStyle(color = OmniText, fontSize = 14.sp),
+                                            cursorBrush = SolidColor(OmniAccent),
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
                                 }
-                                if (!systemCats.contains(c.n)) {
+                                if (!lockedCats.contains(c.n)) {
                                     IconButton(onClick = {
                                         cats.remove(c)
                                         onUpdate()

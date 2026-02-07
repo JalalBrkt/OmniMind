@@ -57,26 +57,34 @@ class MainActivity : ComponentActivity() {
     }
 
     // Activity Result Launchers for File Operations
-    private var pendingExport = false
     private lateinit var repo: Repository
     private lateinit var notesRef: MutableList<Note>
     private lateinit var catsRef: MutableList<Category>
+    private var exportFilter: String? = null // Store filter state
 
     private val exportLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri: Uri? ->
         if (uri != null) {
-            repo.exportToUri(uri, notesRef, catsRef)
-            Toast.makeText(this, "Exported Successfully", Toast.LENGTH_SHORT).show()
+            repo.exportToUri(uri, notesRef, catsRef, exportFilter)
+            val msg = if(exportFilter == "All" || exportFilter == null) "Exported All" else "Exported $exportFilter"
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         }
     }
 
     private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
-            val wrapper = repo.importFromUri(uri)
+            val wrapper = repo.importFromUri(uri, notesRef, catsRef) // Pass current lists for merging
             if (wrapper != null) {
-                notesRef.clear(); notesRef.addAll(wrapper.notes)
-                catsRef.clear(); catsRef.addAll(wrapper.cats)
+                if (wrapper.type == "merged") {
+                    // Update in-place logic if mutable, or replace
+                    notesRef.clear(); notesRef.addAll(wrapper.notes)
+                    catsRef.clear(); catsRef.addAll(wrapper.cats)
+                    Toast.makeText(this, "Import Merged Successfully", Toast.LENGTH_SHORT).show()
+                } else {
+                    notesRef.clear(); notesRef.addAll(wrapper.notes)
+                    catsRef.clear(); catsRef.addAll(wrapper.cats)
+                    Toast.makeText(this, "Import Replaced DB", Toast.LENGTH_SHORT).show()
+                }
                 repo.save(notesRef, catsRef)
-                Toast.makeText(this, "Imported Successfully", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, "Import Failed", Toast.LENGTH_SHORT).show()
             }
@@ -157,8 +165,13 @@ class MainActivity : ComponentActivity() {
 
             if (showSettings) {
                 SettingsDialog(
+                    cats = cats,
                     onDismiss = { showSettings = false },
-                    onExport = { exportLauncher.launch("omnimind_backup.json") },
+                    onExport = { cat ->
+                        exportFilter = cat
+                        val name = if(cat == "All") "omnimind_backup.json" else "omnimind_${cat}.json"
+                        exportLauncher.launch(name)
+                    },
                     onImport = { importLauncher.launch(arrayOf("application/json")) },
                     onWipe = {
                         notes.clear()
