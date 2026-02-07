@@ -220,12 +220,17 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.padding(pad)) {
                     when(screen) {
                         "Vault" -> VaultScreen(notes, cats) { repo.save(notes, cats) }
-                        "Add" -> AddScreen(cats) { n ->
-                            notes.add(0, n)
-                            repo.save(notes, cats)
-                            Toast.makeText(context, "Locked into Vault", Toast.LENGTH_SHORT).show()
-                            screen = "Vault"
-                        }
+                        "Add" -> AddScreen(
+                            notes = notes,
+                            cats = cats,
+                            onSave = { n ->
+                                notes.add(0, n)
+                                repo.save(notes, cats)
+                                Toast.makeText(context, "Locked into Vault", Toast.LENGTH_SHORT).show()
+                                screen = "Vault"
+                            },
+                            onUpdate = { repo.save(notes, cats) }
+                        )
                         "Review" -> ReviewScreen(notes, cats)
                         "Map" -> MindMapScreen(cats, notes)
                     }
